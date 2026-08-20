@@ -1,0 +1,120 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url("{% static 'images/bg_3.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    /* Overlay oscuro para mejorar legibilidad */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: -1;
+    }
+
+    .container {
+        margin-top: 90px;
+        max-width: 650px;
+    }
+
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .card-header {
+        font-size: 1.3rem;
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .btn-custom {
+        background-color: #A87F3F;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #8a662e;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    h2 {
+        color: #fff;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+    }
+
+    .card-body label {
+        font-weight: bold;
+    }
+</style>
+
+{% include "partials/navbar.html" %}
+
+<div class="container">
+    <h2 class="text-center mb-4">
+        <a class="bi bi-arrow-left-circle text-white me-2" href="{% url 'procesos' %}"></a> 
+        PROCESOS
+    </h2>
+    <div class="card border-0">
+        <form id="eventoForm" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h3 class="card-header text-bg-dark text-center">
+                <i class="bi bi-cloud-plus"></i> Nueva Proceso
+            </h3>
+            <div class="card-body">
+                {{ form.as_p }}
+            </div>
+            <div class="card-footer text-center bg-light">
+                <button class="btn btn-custom px-4" type="submit">
+                    <i class="bi bi-cloud-upload"></i> Subir para procesar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<br><br>
+
+{% include 'partials/footer.html' %}  <!-- 👈 footer original sin cambios -->
+
+{% comment %} <script>
+    document.getElementById("eventoForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Se guardará la nueva evidencia.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, guardar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Guardando...",
+                    text: "Por favor, espera.",
+                    icon: "info",
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        this.submit();
+                    }
+                });
+            }
+        });
+    });
+</script> {% endcomment %}
+
+{% endblock %}
+

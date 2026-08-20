@@ -1,0 +1,164 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+<style>
+    body {
+        min-height: 100vh;
+        margin: 0; /* Eliminar márgenes por defecto */
+    }
+
+    .img-bg {
+        background-image: url("{% static 'images/bookujed.png' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    .login-bg {
+        background-color: #951823;
+        min-height: 100vh;
+    }
+
+    .bn-bg{
+        background-color: #951823
+    }
+
+    .bn-bg:hover{
+        background-color: #333;
+    }
+
+    /* Nuevos estilos para eliminar espacios */
+    .login-container {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .footer-section {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+</style>
+
+
+
+<div class="container-fluid vh-100 p-0"> <!-- Añadido p-0 para eliminar padding -->
+    <div class="row h-100 m-0"> <!-- Añadido m-0 para eliminar margen -->
+        <div class="col-md-6 d-flex align-items-center justify-content-center login-bg p-0"> <!-- Añadido p-0 -->
+            
+            <div class="card mb-3 text-center" style="max-width: 600px; background-color: #FFF;">
+                <div class="row g-0">
+                    <div class="col-md-4" style="display: flex; align-items: center; justify-content: center;">
+                        <img src="{% static 'images/ssga_2025.png' %}" class="img-fluid rounded-start" style="max-width: 100px; padding: 10px;" alt="...">
+                    </div>
+                    <div class="col-md-8" style="color: #000;">
+                        <div class="card-body" style="color: #000;">
+                            <h3 class="card-title" style="color: #000">SISTEMA INTEGRAL DE PROCESOS</h3>
+                            <p class="card-text">Acceder a la plataforma</p>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-group" style="color: #000;">
+                                    {{ form.username.label_tag }}
+                                    {{ form.username }}
+                                </div> 
+                                <br>
+                                <div class="form-group" style="color: #000;">
+                                    {{ form.password.label_tag }}
+                                    {{ form.password }}
+                                </div>
+                                <br>
+                                <button type="submit" class="btn" style="background-color: #333333; color: #ffffff;">Iniciar sesión</button>
+                            </form>
+                                <br>
+                                <p class="card-text">Registrate con tu correo instituciónal !</p>
+                                <p><a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a></p>
+                                <a class="btn btn-secondary" href="{% url 'registro' %}" class="btn bn-bg" style="color: #ffffff;">Crear cuenta</a>
+                            <br> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LADO DERECHO: IMAGEN -->
+        <div class="col-md-6 d-none d-md-block img-bg p-0"> <!-- Añadido p-0 -->
+
+        </div>
+
+    </div>
+</div>
+
+<header class="text-white py-4 mt-0" style="background-color: #282C31;">  <!-- Cambiado mt-5 a mt-0 -->
+  <div class="container">
+    <div class="d-flex flex-column align-items-center">
+      <!-- Logo Container -->
+      <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-3">
+        <!-- <a href="#" class="navbar-brand">
+          <img src="{% static 'images/ssga_2025.png' %}" 
+               alt="University Logo" 
+               class="img-fluid" 
+               style="max-width: 70px; height: auto;">
+        </a> -->
+        <a href="#" class="navbar-brand">
+          <img src="{% static 'images/Identidad.png' %}" 
+               alt="University Identity" 
+               class="img-fluid" 
+               style="max-width: 130px; height: auto;">
+        </a>
+      </div>
+      
+      <!-- Title -->
+      <h1 class="h4 mb-0 text-center">UNIVERSIDAD JUÁREZ DEL ESTADO DE DURANGO | SUBSECRETARÍA GENERAL ACADÉMICA</h1>
+    </div>
+  </div>
+</header>
+
+<footer class="text-white py-3 m-0 p-0" style="background-color: #282C31;">  <!-- Añadido p-0 -->
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <h2 class="h6 fw-bold mb-3">Dirección</h2>
+        <address class="mb-0">
+          Cuarto piso, Edificio de la Librería UJED.<br>
+          Victoria Sur 200, esquina con 20 de Noviembre<br>
+          Zona Centro
+        </address>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h2 class="h6 fw-bold mb-3">Contacto</h2>
+        <ul class="list-unstyled">
+          <li>Tel: <a href="tel:+526188271248" class="text-white text-decoration-none">+52(618) 827-12-48</a></li>
+          <li>Email: <a href="mailto:subsecretaria.academica@ujed.mx" class="text-white text-decoration-none">subsecretaria.academica@ujed.mx</a></li>
+        </ul>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h2 class="h6 fw-bold mb-3">Síguenos</h2>
+        <div class="d-flex flex-column gap-2">
+          <a href="#" class="text-white text-decoration-none"><i class="bi bi-facebook"></i> Facebook</a>
+          <a href="#" class="text-white text-decoration-none"><i class="bi bi-instagram"></i> Instagram</a>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <h2 class="h6 fw-bold mb-3">Información</h2>
+        <div class="d-flex flex-column gap-2">
+          <a href="#" class="text-white text-decoration-none">Aviso de privacidad</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<nav class="text-white py-4 mt-0" style="background-color: #A87F3F;">
+  <div class="container">
+    <div class="d-flex flex-column align-items-center">
+      <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-3">
+        <a href="#" class="navbar-brand">
+          <img src="{% static 'images/logo_blanco.png' %}" 
+               alt="University Logo" 
+               class="img-fluid" 
+               style="max-width: 120px; height: auto;">
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{% endblock %}

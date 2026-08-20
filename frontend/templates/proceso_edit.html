@@ -1,0 +1,82 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+      background-image: url("{% static 'images/bg_3.jpg' %}");
+      background-size: cover;  /* Ajusta la imagen al tamaño de la pantalla */
+              background-position: center; /* Centra la imagen */
+              background-repeat: no-repeat; /* No repetir la imagen */
+              background-attachment: fixed; /* Mantiene el fondo fijo al hacer scroll */
+              min-height: 100vh; /* Asegura que cubra toda la pantalla */
+              margin: 0; /* Elimina márgenes */
+    }
+</style> 
+
+{% include "partials/navbar.html" %}
+
+<div class="container mt-5 mb-5" style="max-width: 900px;">
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <!-- TÍTULO DINÁMICO -->
+            <h4 class="mb-4">
+                {% if object %}
+                    ✏️ Editar Proceso
+                {% else %}
+                    ➕ Crear Proceso
+                {% endif %}
+            </h4>
+
+            <!-- FORMULARIO -->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <small class="text-muted">
+                                {{ field.help_text }}
+                            </small>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <!-- BOTONES -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'procesos' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        {% if object %}
+                            <i class="bi bi-save"></i> Guardar cambios
+                        {% else %}
+                            <i class="bi bi-plus-circle"></i> Crear proceso
+                        {% endif %}
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% include "partials/footer.html" %}
+
+{% endblock %}

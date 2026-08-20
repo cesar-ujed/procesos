@@ -1,0 +1,147 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url("{% static 'images/bg_3.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+
+    .card-stat {
+        border-radius: 12px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        color: #6c757d;
+    }
+</style>
+
+{% include "partials/navbar.html" %}
+
+<div class="container mt-5">
+
+    <!-- TÍTULO -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </h2>
+            <p class="text-muted mb-0">
+                Resumen general del sistema
+            </p>
+        </div>
+    </div>
+
+    <!-- TARJETAS PRINCIPALES -->
+    <div class="row g-4">
+
+        <!-- PROCESOS -->
+        <div class="col-md-3">
+            <div class="card card-stat shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-number text-primary">
+                        {{ total_procesos }}
+                    </div>
+                    <div class="stat-label">
+                        Procesos
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVIDADES -->
+        <div class="col-md-3">
+            <div class="card card-stat shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-number text-dark">
+                        {{ total_actividades }}
+                    </div>
+                    <div class="stat-label">
+                        Actividades
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APROBADAS -->
+        <div class="col-md-3">
+            <div class="card card-stat shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-number text-success">
+                        {{ actividades_aprobadas }}
+                    </div>
+                    <div class="stat-label">
+                        Aprobadas
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PENDIENTES -->
+        <div class="col-md-3">
+            <div class="card card-stat shadow-sm">
+                <div class="card-body text-center">
+                    <div class="stat-number text-danger">
+                        {{ actividades_pendientes }}
+                    </div>
+                    <div class="stat-label">
+                        Pendientes
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SEGUNDA FILA -->
+    <div class="row mt-5">
+
+        <!-- EN REVISIÓN -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    <i class="bi bi-hourglass-split"></i> Actividades en revisión
+                </div>
+                <div class="card-body text-center">
+                    <h3 class="text-warning fw-bold">
+                        {{ actividades_en_revision }}
+                    </h3>
+                    <p class="text-muted mb-0">
+                        Actividades revisadas pero no aprobadas
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESPACIO PARA FUTURAS GRÁFICAS -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    <i class="bi bi-graph-up"></i> Estadísticas
+                </div>
+                <div class="card-body text-center text-muted">
+                    Aquí puedes agregar gráficas más adelante
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<br><br>
+
+{% include "partials/footer.html" %}
+{% endblock %}

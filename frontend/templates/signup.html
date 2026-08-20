@@ -1,0 +1,60 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+      background-color: #212529;
+      background-size: cover;  /* Ajusta la imagen al tamaño de la pantalla */
+              background-position: center; /* Centra la imagen */
+              background-repeat: no-repeat; /* No repetir la imagen */
+              background-attachment: fixed; /* Mantiene el fondo fijo al hacer scroll */
+              min-height: 100vh; /* Asegura que cubra toda la pantalla */
+              margin: 0; /* Elimina márgenes */
+    }
+</style>
+
+{% include "partials/navbar.html" %}
+
+<div class="container" style="margin-top: 60px;">  
+    <form action="/registrarme/" method="POST">
+        {% csrf_token %}
+        <div class="card mb-3" style="max-width: 800px;">
+            <h2 class="card-header">Registrarme!</h2>
+            <div class="card-body">
+              <div class="alert alert-warning" role="alert">
+                Favor utilizar tu correo institucional como nombre de usuario.
+              </div>
+              {{ form }}
+            <button class="btn btn-sm float-end" type="submit" style="background-color: #212529; color: #fff;">Registrarme</button>
+          </div>
+        </div>
+    </form>
+</div>
+
+<nav class="navbar" style="background: #212529; color: white; padding: 15px 0; margin-top: 60px;">
+    <div class="container-fluid d-flex flex-column align-items-center text-center">
+      <!-- Imagen centrada -->
+      <a class="navbar-brand" href="#">
+        <!-- <img src="{% static 'images/Identidad.png' %}" alt="Logo" width="130" height="auto" class="d-inline-block align-text-top"> -->
+      </a>
+      <!-- Texto centrado debajo de la imagen -->
+      <!-- <h1 class="mb-0">SUBSECRETARÍA GENERAL ACADÉMICA</h1> -->
+    </div>
+</nav>
+<nav class="text-white py-4 mt-0" style="background-color: #ba0000;">  <!-- Elimina margen superior -->
+    <div class="container">
+      <div class="d-flex flex-column align-items-center">
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 mb-3">
+          <a href="#" class="navbar-brand">
+            <img src="{% static 'images/logo_blanco.png' %}" 
+                 alt="University Logo" 
+                 class="img-fluid" 
+                 style="max-width: 120px; height: auto;">
+          </a>
+        </div>
+      </div>
+    </div>
+</nav> 
+
+{% endblock %}

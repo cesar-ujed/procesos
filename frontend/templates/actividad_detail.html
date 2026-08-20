@@ -1,0 +1,300 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url("{% static 'images/bg_3.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    .card-evidencia { border-left: 5px solid #dee2e6; transition: all 0.3s ease; }
+    .estado-pendiente { border-left-color: #ffc107; }
+    .estado-aprobada { border-left-color: #198754; background-color: #f8fff9; }
+    .estado-correccion { border-left-color: #dc3545; }
+    
+    .select-bloqueado {
+        background-color: #e9ecef !important;
+        color: #198754 !important;
+        border-color: #198754 !important;
+        font-weight: bold;
+        cursor: not-allowed;
+    }
+    .feedback-scroll { max-height: 150px; overflow-y: auto; padding: 10px; background: #f1f3f5; border-radius: 8px; }
+    
+    /* Estilos para la tabla de detalles */
+    .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: #6c757d; }
+    .info-data { font-size: 0.95rem; color: #212529; margin-bottom: 1rem; }
+</style>
+
+{% include "partials/navbar.html" %}
+
+<div class="container mt-4 mb-5">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill me-2"></i>{% endif %}
+                {% if message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill me-2"></i>{% endif %}
+                {% if message.tags == 'error' %}<i class="bi bi-x-circle-fill me-2"></i>{% endif %}
+                {% if message.tags == 'info' %}<i class="bi bi-info-circle-fill me-2"></i>{% endif %}
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h3 class="fw-bold mb-0 text-primary">Actividad {{ actividad.numero }}</h3>
+                <span class="text-muted">Proceso: <strong>{{ actividad.proceso.nombre_proceso }}</strong></span>
+            </div>
+            
+            <div class="text-end">
+                {% if request.user.groups.all.0.name == "admin_direccion" or request.user.is_superuser %}
+                    <form method="post" action="{% url 'cambiar_estatus_actividad' actividad.pk %}" id="form-estatus-actividad">
+                        {% csrf_token %}
+                        <label class="small fw-bold d-block mb-1 text-muted text-uppercase">Control de Dirección</label>
+                        <div class="input-group">
+                            <select name="estado" id="select-maestro"
+                                    class="form-select {% if actividad.estado == 'aprobada' %}select-bloqueado{% endif %}" 
+                                    {% if actividad.estado == "aprobada" %} disabled {% endif %}>
+                                <option value="pendiente" {% if actividad.estado == "pendiente" %}selected{% endif %}>Pendiente</option>
+                                <option value="aprobada" {% if actividad.estado == "aprobada" %}selected{% endif %}>Aprobada</option>
+                            </select>
+                            
+                            {% if actividad.estado != "aprobada" %}
+                                <button class="btn btn-primary" type="button" onclick="validarYEnviarActividad()">
+                                    OK
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="mt-2">
+                        <label class="small fw-bold d-block mb-1 text-muted text-uppercase">Estado Actual</label>
+                        <span class="badge {% if actividad.estado == 'aprobada' %}bg-success{% else %}bg-warning text-dark{% endif %} fs-6">
+                            {{ actividad.get_estado_display }}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header bg-light py-3 border-bottom">
+            <h5 class="mb-0 fw-bold text-secondary"><i class="bi bi-info-square me-2"></i>Detalles y Requerimientos</h5>
+        </div>
+        <div class="card-body">
+            
+            <div class="row">
+                <div class="col-12 mb-2">
+                    <div class="info-label">Descripción de la Actividad</div>
+                    <div class="info-data">{{ actividad.descripcion|linebreaksbr }}</div>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25 mt-0">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-people me-1"></i>Responsables</div>
+                    <div class="info-data">
+                        {% for resp in actividad.responsables.all %}
+                            <span class="badge bg-secondary mb-1">{{ resp.get_full_name|default:resp.username }}</span>
+                        {% empty %}
+                            <span class="text-muted fst-italic">Sin responsables asignados</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-clock-history me-1"></i>Tiempo Estimado</div>
+                    <div class="info-data">{{ actividad.tiempo_dias_habiles }} días hábiles</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-tools me-1"></i>Herramientas</div>
+                    <div class="info-data">{{ actividad.herramientas }}</div>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-box-seam me-1"></i>Producto / Servicio Esperado</div>
+                    <div class="info-data">{{ actividad.producto_servicio }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-person-badge me-1"></i>Destinatario</div>
+                    <div class="info-data">{{ actividad.destinatario }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-send me-1"></i>Medio de Entrega</div>
+                    <div class="info-data">{{ actividad.medio_entrega }}</div>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="info-label"><i class="bi bi-hdd-network me-1"></i>Tipo de Recurso</div>
+                    <div class="info-data">{{ actividad.tipo_recurso }}</div>
+                </div>
+                <div class="col-md-8">
+                    <div class="info-label">Descripción del Recurso</div>
+                    <div class="info-data">{{ actividad.descrip_recurso }}</div>
+                </div>
+            </div>
+
+            <div class="bg-light p-3 rounded mt-2 d-flex justify-content-between align-items-center flex-wrap small text-muted">
+                <div>
+                    <strong>Creada por:</strong> {{ actividad.creada_por.get_full_name|default:actividad.creada_por.username|default:"N/A" }} el {{ actividad.fecha_creacion|date:"d/m/Y" }}
+                </div>
+                {% if actividad.estado == 'aprobada' %}
+                    <div class="text-success fw-bold">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Aprobada por: {{ actividad.revisada_por.get_full_name|default:actividad.revisada_por.username }} el {{ actividad.fecha_revision|date:"d/m/Y H:i" }}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h5 class="mb-0 fw-bold text-secondary"><i class="bi bi-journal-check me-2"></i>Evidencias Cargadas</h5>
+        </div>
+        <div class="card-body">
+            {% for evidencia in actividad.evidencias.all %}
+                <div class="card card-evidencia mb-4 shadow-sm estado-{{ evidencia.estado }}">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            
+                            <div class="col-md-6">
+                                <a href="{{ evidencia.archivo.url }}" target="_blank" class="fw-bold text-decoration-none">
+                                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>Ver Documento
+                                </a>
+                                <div class="text-muted small mt-1">
+                                    Subido por <strong>{{ evidencia.subida_por }}</strong>
+                                    <br>
+                                    <i class="bi bi-clock-history"></i> Última modificación: {{ evidencia.fecha_subida|date:"d/m/Y H:i" }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                {% if request.user.groups.all.0.name == "admin_direccion" or request.user.is_superuser %}
+                                    <form method="post" action="{% url 'cambiar_estado_evidencia' evidencia.pk %}">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light fw-bold">Estatus</span>
+                                            <select name="estado" class="form-select" 
+                                                {% if evidencia.estado == "aprobada" or actividad.estado == "aprobada" %} disabled {% endif %}>
+                                                <option value="pendiente" {% if evidencia.estado == "pendiente" %}selected{% endif %}>Pendiente</option>
+                                                <option value="aprobada" {% if evidencia.estado == "aprobada" %}selected{% endif %}>Aprobada</option>
+                                                <option value="correccion" {% if evidencia.estado == "correccion" %}selected{% endif %}>Requiere Corrección</option>
+                                            </select>
+                                            {% if evidencia.estado != "aprobada" and actividad.estado != "aprobada" %}
+                                                <button class="btn btn-success" type="submit">OK</button>
+                                            {% endif %}
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <div class="text-end">
+                                        <span class="small fw-bold text-muted text-uppercase d-block mb-1">Estatus actual:</span>
+                                        {% if evidencia.estado == "aprobada" %}
+                                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Aprobada</span>
+                                        {% elif evidencia.estado == "correccion" %}
+                                            <span class="badge bg-danger"><i class="bi bi-exclamation-triangle-fill"></i> Requiere Corrección</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">⏳ Pendiente de revisión</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                                {% if evidencia.estado == "correccion" and actividad.estado != "aprobada" %}
+                                    <div class="text-end mt-2">
+                                        <a href="{% url 'corregir_evidencia' evidencia.pk %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-arrow-repeat"></i> Subir Corrección
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="feedback-scroll mt-3 mb-2">
+                            {% for feedback in evidencia.feedbacks.all %}
+                                <div class="bg-white p-2 rounded border mb-1 small shadow-sm">
+                                    <div class="d-flex justify-content-between">
+                                        <strong class="text-primary">{{ feedback.creado_por.username }}</strong>
+                                        <span class="text-muted" style="font-size: 0.7rem;">{{ feedback.fecha|date:"d/m H:i" }}</span>
+                                    </div>
+                                    <p class="mb-0 mt-1">{{ feedback.comentario }}</p>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted small mb-0 italic">Sin comentarios.</p>
+                            {% endfor %}
+                        </div>
+
+                        {% if actividad.estado != "aprobada" %}
+                            <form method="post" action="{% url 'crear_feedback' evidencia.pk %}">
+                                {% csrf_token %}
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="comentario" class="form-control" placeholder="Añadir comentario..." required>
+                                    <button class="btn btn-outline-primary" type="submit">Enviar</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted fs-1"></i>
+                    <p class="text-muted mt-2">No hay evidencias cargadas para esta actividad.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'proceso_detail' actividad.proceso.pk %}" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-left me-1"></i> Regresar al Proceso
+        </a>
+        {% if actividad.estado != "aprobada" %}
+            <a href="{% url 'subir_evidencia' actividad.pk %}" class="btn btn-primary">
+                <i class="bi bi-cloud-arrow-up me-1"></i> Subir Nueva Evidencia
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function validarYEnviarActividad() {
+        const formulario = document.getElementById('form-estatus-actividad');
+        const nuevoEstatus = document.getElementById('select-maestro').value;
+
+        if (nuevoEstatus === 'aprobada') {
+            Swal.fire({
+                title: '¿Confirmar Aprobación?',
+                text: "Se bloqueará la actividad y todas sus evidencias de forma permanente. ¿Deseas continuar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, Aprobar y Cerrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    formulario.submit();
+                }
+            });
+        } else {
+            formulario.submit();
+        }
+    }
+</script>
+{% endblock %}

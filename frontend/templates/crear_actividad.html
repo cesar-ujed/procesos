@@ -1,0 +1,162 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url("{% static 'images/bg_3.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+    }
+</style>
+
+{% include "partials/navbar.html" %}
+
+<div class="container mt-5 mb-5">
+
+    <!-- Título + botón volver -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h3 class="fw-bold mb-1">
+                Nueva actividad
+            </h3>
+            <p class="text-muted mb-0">
+                Proceso: <strong>{{ proceso.nombre_proceso }}</strong>
+            </p>
+        </div>
+
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'proceso_detail' proceso.pk %}"
+               class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al proceso
+            </a>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Número -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.numero.label }}
+                    </label>
+                    {{ form.numero }}
+                    {{ form.numero.errors }}
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.descripcion.label }}
+                    </label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
+
+                <!-- Responsables -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.responsables.label }}
+                    </label>
+                    {{ form.responsables }}
+                    {{ form.responsables.errors }}
+                    <small class="text-muted">
+                        Puedes seleccionar más de un responsable
+                    </small>
+                </div>
+
+                <!-- Herramientas -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.herramientas.label }}
+                    </label>
+                    {{ form.herramientas }}
+                </div>
+
+                <!-- Tiempo -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.tiempo_dias_habiles.label }}
+                    </label>
+                    {{ form.tiempo_dias_habiles }}
+                </div>
+
+                <!-- Documentos generados -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.documentos_generados.label }}
+                    </label>
+                    {{ form.documentos_generados }}
+                </div>
+
+                <!-- Producto / Servicio -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.producto_servicio.label }}
+                    </label>
+                    {{ form.producto_servicio }}
+                </div>
+
+                <!-- Destinatario -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.destinatario.label }}
+                    </label>
+                    {{ form.destinatario }}
+                </div>
+
+                <!-- Medio de entrega -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.medio_entrega.label }}
+                    </label>
+                    {{ form.medio_entrega }}
+                </div>
+
+                <!-- Documento final -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.documento_final.label }}
+                    </label>
+                    {{ form.documento_final }}
+                </div>
+
+                <!-- Tipo recurso -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.tipo_recurso.label }}
+                    </label>
+                    {{ form.tipo_recurso }}
+                </div>
+
+                <!-- Descripción recurso -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {{ form.descrip_recurso.label }}
+                    </label>
+                    {{ form.descrip_recurso }}
+                </div>
+
+                <!-- Acciones -->
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-success">
+                        Guardar actividad
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include "partials/footer.html" %}
+{% endblock %}

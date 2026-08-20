@@ -1,0 +1,63 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #212529;">
+    <div class="container-fluid">
+        <!-- Logo como enlace a la página principal -->
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo_blanco.png' %}" alt="Logo SSGA" width="90">
+        </a>
+
+        <!-- Botón para móviles -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+                aria-controls="navbarMain" aria-expanded="false" aria-label="Menú">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Contenido principal del navbar -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <!-- Elementos de navegación -->
+            <ul class="navbar-nav me-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'cursos' %}active{% endif %}" 
+                        href="{% url "dashboard" %}">
+                            DASHBOARD
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'cursos' %}active{% endif %}" 
+                           href="{% url "procesos" %}">
+                            PROCESOS
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <!-- Elementos de usuario -->
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <!-- Menú desplegable del usuario -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                           <i class="bi bi-person-square"> </i>{{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person-square"> </i>Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-left"> </i>Cerrar sesión</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <!-- Opciones para usuarios no autenticados -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Registrarse</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

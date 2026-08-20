@@ -1,0 +1,56 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+      background-image: url("{% static 'images/bg_3.jpg' %}");
+      background-size: cover;  /* Ajusta la imagen al tamaño de la pantalla */
+              background-position: center; /* Centra la imagen */
+              background-repeat: no-repeat; /* No repetir la imagen */
+              background-attachment: fixed; /* Mantiene el fondo fijo al hacer scroll */
+              min-height: 100vh; /* Asegura que cubra toda la pantalla */
+              margin: 0; /* Elimina márgenes */
+    }
+</style> 
+
+{% include "partials/navbar.html" %}
+
+<div class="container mt-5 mb-5">
+
+    <!-- Título -->
+    <div class="row mb-4">
+        <div class="col">
+            <h3 class="fw-bold">
+                Subir documentos
+            </h3>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Número -->
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <!-- Acciones -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'proceso_detail' proceso.pk %}"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-success">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include "partials/footer.html" %}
+{% endblock %}

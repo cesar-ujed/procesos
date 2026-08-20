@@ -1,0 +1,294 @@
+{% extends "partials/main.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url("{% static 'images/bg_3.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+    }
+</style>
+
+{% include "partials/navbar.html" %}
+
+<div class="container mt-5 mb-5">
+
+    <!-- Encabezado -->
+    <div class="row align-items-center mb-4">
+
+        <!-- Título + estatus -->
+        <div class="col-md-6">
+            <h2 class="fw-bold mb-1">{{ proceso.nombre_proceso }}</h2>
+
+            <div class="d-flex align-items-center gap-3 mt-1">
+
+                <span class="badge
+                    {% if proceso.estatus == 'pendiente' %}bg-secondary
+                    {% elif proceso.estatus == 'en_ejecucion' %}bg-info
+                    {% elif proceso.estatus == 'completado' %}bg-success
+                    {% endif %}
+                ">
+                    {{ proceso.get_estatus_display }}
+                </span>
+
+                {% if perms.backend.change_proceso %}
+                <form method="POST"
+                      action="{% url 'proceso_cambiar_estatus' proceso.pk %}">
+                    {% csrf_token %}
+
+                    <select name="estatus"
+                            class="form-select form-select-sm"
+                            style="width: 160px"
+                            onchange="this.form.submit()">
+
+                        {% for value, label in proceso.ESTADO %}
+                            <option value="{{ value }}"
+                                {% if proceso.estatus == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="col-md-6">
+
+            <div class="d-flex justify-content-md-end mt-3 mt-md-0">
+
+                <div style="width: 260px;">
+
+                    <small class="text-muted">
+                        Progreso {{ porcentaje }}%
+                    </small>
+
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: {{ porcentaje }}%;"
+                             aria-valuenow="{{ porcentaje }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+
+                    <small class="text-muted">
+                        {{ actividades_aprobadas }} / {{ total_actividades }} actividades
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Información principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong>Dirección:</strong>
+                    <p class="mb-0">
+                        {{ proceso.direccion.nombre|default:"No definida" }}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <strong>Fecha de creación:</strong>
+                    <p class="mb-0">
+                        {{ proceso.fecha_creacion }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <strong>Descripción:</strong>
+                    <p>
+                        {{ proceso.descripcion|default:"Sin descripción" }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <strong>Formato:</strong>
+                    {% if proceso.formato %}
+                        <a href="{{ proceso.formato.url }}" target="_blank">
+                            Ver formato
+                        </a>
+                    {% else %}
+                        <span class="text-muted">No hay formato cargado</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <strong>Fuente:</strong>
+                    <p class="mb-0">
+                        {{ proceso.fuente|default:"No especificada" }}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Responsables -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Responsables</h5>
+
+            {% for user in proceso.responsables.all %}
+                <span class="badge bg-primary me-1 mb-1">
+                    {{ user.get_full_name|default:user.username }}
+                </span>
+            {% empty %}
+                <p class="text-muted mb-0">No hay responsables asignados</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'procesos' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a procesos
+        </a>
+
+        {% if perms.backend.add_actividad %}
+        <a href="{% url 'actividad_crear' proceso.pk %}"
+           class="btn btn-dark">
+            <i class="bi bi-plus-circle"></i> Nueva actividad
+        </a>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Actividades -->
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">
+                <i class="bi bi-list-check"></i> Actividades
+            </h5> 
+            {% if actividades %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Descripción</th>
+                                <th>Responsables</th>
+                                <th>Estatus</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for actividad in actividades %}
+                            <tr>
+                                <td>{{ actividad.numero }}</td>
+                                
+                                <td>{{ actividad.descripcion|truncatechars:60 }}</td>
+                                
+                                <td>
+                                    {% for user in actividad.responsables.all %}
+                                    <span class="badge bg-secondary me-1">
+                                        {{ user.get_full_name|default:user.username }}
+                                    </span>
+                                    {% empty %}
+                                    <span class="text-muted">Sin responsables</span>
+                                    {% endfor %}
+                                </td>
+
+                                <td>
+                                    {% if actividad.estado == 'aprobada' %}                                        
+                                        <span class="badge bg-success">Aprobada</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td>
+                                    <div class="d-flex gap-1">
+
+                                        <a href="{% url 'actividad_detail' actividad.pk %}"
+                                            class="btn btn-outline-primary btn-sm" title="Ver">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    
+                                        {% if perms.backend.delete_actividad %}
+                                        <form method="POST"
+                                            action="{% url 'eliminar_actividad' actividad.pk %}"
+                                            id="form-eliminar-{{ actividad.pk }}"
+                                            class="m-0">
+                                            {% csrf_token %}
+                                            <button 
+                                                type="button"
+                                                class="btn btn-outline-danger btn-sm"
+                                                data-pk="{{ actividad.pk }}"
+                                                onclick="confirmarEliminacion(this.dataset.pk)"
+                                                title="Eliminar">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+
+                                        {% if perms.backend.delete_actividad %}
+                                        <a href="{% url 'editaractividad' actividad.pk %}"
+                                            class="btn btn-outline-primary btn-sm" title="Editar">
+                                            <i class="bi bi-pen"></i>
+                                        </a>
+                                        {% endif %}
+
+                                    </div>
+                                </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">
+                No hay actividades registradas para este proceso.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+    
+    
+{% include "partials/footer.html" %}
+
+<script>
+function confirmarEliminacion(pk) {
+    Swal.fire({
+        title: '¿Eliminar actividad?',
+        text: "Se eliminará permanentemente",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ba0000',
+        cancelButtonColor: '#212529',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(`form-eliminar-${pk}`).submit();
+        }
+    });
+}
+</script>
+
+{% endblock %}
