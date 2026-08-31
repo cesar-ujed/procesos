@@ -69,7 +69,7 @@
                             </form>
                                 <br>
                                 <p class="card-text">Registrate con tu correo instituciónal !</p>
-                                <p><a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a></p>
+                                {% comment %} <p><a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a></p> {% endcomment %}
                                 <a class="btn btn-secondary" href="{% url 'registro' %}" class="btn bn-bg" style="color: #ffffff;">Crear cuenta</a>
                             <br> 
                         </div>
