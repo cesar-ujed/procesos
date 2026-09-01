@@ -30,7 +30,7 @@ class IndexView(TemplateView):
 class LoginView(FormView):
     template_name = 'login.html'  # Ruta al archivo de plantilla
     form_class = BootstrapAuthenticationForm
-    success_url = reverse_lazy('dashboard')  # Redirigir después de iniciar sesión
+    success_url = reverse_lazy('procesos')  # Redirigir después de iniciar sesión
 
     def dispatch(self, request, *args, **kwargs):
         """Cierra la sesión antes de procesar cualquier solicitud a esta vista"""
