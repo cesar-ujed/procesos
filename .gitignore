@@ -1,8 +1,19 @@
+# variables de entorno
 .env
-__pycache__/
-*.sqlite3
-*.pyc
+
+# entornos virtuales
 venv/
+/venv/
+env/
+.env/
+
+# python
+__pycache__/
+
+# django
+*.sqlite3
+staticfiles/
+
+*.pyc
 requirements.txt
 /media/
-/venv/
